@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#B8860B">
+  <title>AllArch — Panel Administrador</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="manifest" href="manifest.webmanifest">
+</head>
+<body>
+  <header class="aa-header" id="appHeader"></header>
+
+  <main class="aa-page">
+    <div class="aa-container">
+      <div class="aa-stats" id="statsAdmin"></div>
+
+      <div class="aa-tabs">
+        <button class="aa-tab active" onclick="cambiarTabAdmin('arqueologos')">👤 Arqueólogos</button>
+        <button class="aa-tab" onclick="cambiarTabAdmin('hallazgos')">📷 Hallazgos</button>
+      </div>
+
+      <div id="tabArqueologos">
+        <h3 class="aa-section-title">Pendientes de aprobación <span class="aa-section-count" id="contadorPendientes">0</span></h3>
+        <div id="listaPendientes" class="aa-finding-list"></div>
+
+        <h3 class="aa-section-title aa-mt-3">Arqueólogos verificados <span class="aa-section-count" id="contadorAprobados">0</span></h3>
+        <div id="listaAprobados" class="aa-finding-list"></div>
+      </div>
+
+      <div id="tabHallazgos" style="display:none;">
+        <h3 class="aa-section-title">Todos los hallazgos <span class="aa-section-count" id="contadorHallazgos">0</span></h3>
+        <div id="listaHallazgos" class="aa-finding-list"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/pwa-install.js"></script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#B8860B">
+  <title>AllArch — Registro</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="manifest" href="manifest.webmanifest">
+</head>
+<body>
+  <div class="aa-center-page">
+    <div class="aa-card" style="width:100%;max-width:420px;">
+      <div class="aa-card-header">
+        <h1>🏛️ AllArch</h1>
+        <p>Registro de ciudadano explorador</p>
+      </div>
+      <div class="aa-card-body">
+        <form id="registroForm" onsubmit="registrarUsuario(event)">
+          <div class="aa-form-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" class="aa-input" placeholder="Tu nombre" required>
+          </div>
+          <div class="aa-form-group">
+            <label for="apellidos">Apellidos</label>
+            <input type="text" id="apellidos" class="aa-input" placeholder="Tus apellidos" required>
+          </div>
+          <div class="aa-form-group">
+            <label for="email">Correo electrónico</label>
+            <input type="email" id="email" class="aa-input" placeholder="tu@correo.com" required>
+          </div>
+          <div class="aa-form-group">
+            <label for="telefono">Teléfono (opcional)</label>
+            <input type="tel" id="telefono" class="aa-input" placeholder="+57 300 123 4567">
+          </div>
+          <div class="aa-form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" class="aa-input" placeholder="Mínimo 4 caracteres" required minlength="4">
+          </div>
+          <div class="aa-form-group">
+            <label for="password2">Confirmar contraseña</label>
+            <input type="password" id="password2" class="aa-input" placeholder="Repite tu contraseña" required>
+          </div>
+          <button type="submit" id="registroBtn" class="aa-btn aa-btn-primary aa-btn-block aa-btn-lg">
+            Crear mi cuenta
+          </button>
+        </form>
+        <p class="aa-text-center aa-mt-2">
+          <a href="index.html" class="aa-link">← Ya tengo cuenta</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    async function registrarUsuario(event) {
+      event.preventDefault();
+
+      const nombre = document.getElementById('nombre').value.trim();
+      const apellidos = document.getElementById('apellidos').value.trim();
+      const email = document.getElementById('email').value.trim().toLowerCase();
+      const telefono = document.getElementById('telefono').value.trim();
+      const password = document.getElementById('password').value;
+      const password2 = document.getElementById('password2').value;
+      const btn = document.getElementById('registroBtn');
+
+      if (password !== password2) {
+        mostrarAlerta('Las contraseñas no coinciden', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      const textoOriginal = btn.innerHTML;
+      btn.innerHTML = '<span class="spinner"></span> Registrando...';
+
+      try {
+        const check = await fetch(
+          `${CONFIG.API_BASE}/usuarios?email=eq.${encodeURIComponent(email)}&select=id`,
+          { headers: CONFIG.HEADERS }
+        );
+        const existing = await check.json();
+        if (existing && existing.length > 0) {
+          throw new Error('Ya existe una cuenta con este correo.');
+        }
+
+        const r = await fetch(`${CONFIG.API_BASE}/usuarios`, {
+          method: 'POST',
+          headers: { ...CONFIG.HEADERS, 'Prefer': 'return=representation' },
+          body: JSON.stringify({
+            email, password, nombre, apellidos, telefono: telefono || null,
+            tipo_usuario: 'publico', activo: true, aprobado: true
+          })
+        });
+
+        if (!r.ok) throw new Error('Error al crear la cuenta. Intenta de nuevo.');
+
+        const usuarios = await r.json();
+        const usuario = usuarios[0];
+
+        setUser({
+          id: usuario.id, email: usuario.email,
+          nombre: usuario.nombre, apellidos: usuario.apellidos,
+          tipo_usuario: 'publico', aprobado: true,
+          loginTime: new Date().toISOString()
+        });
+
+        mostrarAlerta('¡Cuenta creada! Bienvenido a AllArch', 'success', 1500);
+        setTimeout(() => { window.location.href = 'dashboard_publico.html'; }, 1500);
+
+      } catch (error) {
+        mostrarAlerta(error.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = textoOriginal;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#B8860B">
+  <title>AllArch — Mis Hallazgos</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="manifest" href="manifest.webmanifest">
+</head>
+<body>
+  <header class="aa-header" id="appHeader"></header>
+
+  <main class="aa-page">
+    <div class="aa-container">
+      <h2 class="aa-section-title">📷 Mis Hallazgos <span class="aa-section-count" id="contadorHallazgos">0</span></h2>
+      <div id="listaHallazgos">
+        <div class="aa-loading"><div class="spinner"></div><span>Cargando hallazgos...</span></div>
+      </div>
+    </div>
+  </main>
+
+  <a href="nuevo_hallazgo.html" class="aa-fab" title="Reportar hallazgo">＋</a>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/publico.js"></script>
+  <script src="js/pwa-install.js"></script>
+</body>
+</html>

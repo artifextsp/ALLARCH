@@ -55,13 +55,37 @@ async function comprimirImagen(file, maxWidth, quality) {
 function obtenerUbicacion() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      reject(new Error('Geolocalización no disponible en este navegador'));
+      reject(new Error('Tu navegador no soporta geolocalización'));
       return;
     }
+
+    let resuelta = false;
+
+    // Intento 1: alta precisión (GPS real)
     navigator.geolocation.getCurrentPosition(
-      pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      err => reject(err),
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      pos => {
+        if (!resuelta) { resuelta = true; resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }); }
+      },
+      () => {
+        // Intento 2: baja precisión (red/wifi) como fallback
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            if (!resuelta) { resuelta = true; resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }); }
+          },
+          err => {
+            if (!resuelta) {
+              resuelta = true;
+              let msg = 'No se pudo obtener la ubicación.';
+              if (err.code === 1) msg = 'Permiso de ubicación denegado. Ve a Ajustes > Safari > Ubicación y permite el acceso.';
+              else if (err.code === 2) msg = 'Ubicación no disponible. Verifica que el GPS esté activado.';
+              else if (err.code === 3) msg = 'Tardó demasiado. Intenta de nuevo en un lugar con mejor señal.';
+              reject(new Error(msg));
+            }
+          },
+          { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 }
+        );
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
     );
   });
 }

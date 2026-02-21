@@ -69,17 +69,21 @@ async function detectarUbicacion() {
   const status = document.getElementById('gpsStatus');
 
   btnGPS.disabled = true;
-  status.textContent = 'Detectando...';
+  btnGPS.innerHTML = '📍 Detectando...';
+  status.textContent = 'Buscando señal GPS...';
+  status.style.color = 'var(--text-muted)';
 
   try {
     const pos = await obtenerUbicacion();
     document.getElementById('latitud').value = pos.lat;
     document.getElementById('longitud').value = pos.lng;
-    status.textContent = `✅ ${pos.lat.toFixed(4)}, ${pos.lng.toFixed(4)}`;
+    status.textContent = `✅ Ubicación detectada (${pos.lat.toFixed(4)}, ${pos.lng.toFixed(4)})`;
     status.style.color = 'var(--success)';
+    btnGPS.innerHTML = '📍 Ubicación obtenida ✓';
   } catch (error) {
-    status.textContent = '❌ No se pudo detectar. Escribe la dirección.';
+    status.innerHTML = `❌ ${error.message}<br><small style="color:var(--text-muted)">Puedes escribir la dirección manualmente abajo.</small>`;
     status.style.color = 'var(--danger)';
+    btnGPS.innerHTML = '📍 Reintentar GPS';
     console.error('GPS error:', error);
   }
 
